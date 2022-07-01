@@ -48,22 +48,6 @@ window.countNRooksSolutions = function(n) {
   var board = new Board({'n': n});
   var rows = board.rows();
 
-  // var innerFunc = function(num) {
-  //   for (var row = 0; row < n; row++) {
-  //     //iterate over col while col is less than n
-  //     for (col = num; col < n; col++) {
-  //       // add 1 to that row and col
-  //       rows[row][col] = 1;
-  //       // if the board has any rooks conflicts
-  //       if (!board.hasAnyRooksConflicts()) {
-  //         // that row and col equals 0
-  //         solutionCount++;
-  //         innerFunc(num + 1);
-  //         rows[row][col] = 0;
-  //       }
-  //     }
-  //   }
-  // };
   var innerFunc = function(columnIndex) {
     if (columnIndex === n) {
       solutionCount++;
@@ -87,7 +71,34 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
+
   var solution = undefined; //fixme
+  var board = new Board({'n': n});
+  var rows = board.rows();
+
+  if (n === 2 || n === 3) {
+    return rows;
+  }
+
+  var innerFunc = function(columnIndex) {
+    if (columnIndex === n) {
+      solution = rows;
+      return;
+    }
+    for (var row = 0; row < n; row++) {
+      rows[row][columnIndex] = 1;
+      if (!board.hasAnyQueenConflictsOn(row, columnIndex)) {
+        innerFunc(columnIndex + 1);
+      }
+      if (solution !== undefined) {
+        break;
+      }
+      rows[row][columnIndex] = 0;
+    }
+  };
+
+
+  innerFunc(0);
 
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
@@ -95,7 +106,24 @@ window.findNQueensSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+  var solutionCount = 0; //fixme
+  var board = new Board({'n': n});
+  var rows = board.rows();
+
+  var innerFunc = function(columnIndex) {
+    if (columnIndex === n) {
+      solutionCount++;
+    }
+    for (var row = 0; row < n; row++) {
+      rows[row][columnIndex] = 1;
+      if (!board.hasAnyQueenConflictsOn(row, columnIndex)) {
+        innerFunc(columnIndex + 1);
+      }
+      rows[row][columnIndex] = 0;
+    }
+  };
+
+  innerFunc(0);
 
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
